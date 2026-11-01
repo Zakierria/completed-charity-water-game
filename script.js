@@ -4,12 +4,44 @@ let dropMaker; // Will store our timer that creates drops regularly
 let countdown;
 let timeLeft = 30;
 let score = 0;
+let gameMode;
+let newHighScore = false;
 const difficulties = {
   easy: { time: 30, dropDuration: 4 },
   medium: { time: 30, dropDuration: 3 },
   hard: { time: 25, dropDuration: 2 },
 };
 const difficultySelect = document.getElementById("difficulty");
+const highScores = loadHighScores();
+const highScoreDialog = document.getElementById("high-score-dialog");
+
+function loadHighScores() {
+  const savedScores = JSON.parse(localStorage.getItem("waterDropHighScores") || "{}");
+  return Object.fromEntries(
+    Object.keys(difficulties).map((mode) => [
+      mode,
+      Number.isFinite(savedScores[mode]) && savedScores[mode] >= 0 ? savedScores[mode] : 0,
+    ]),
+  );
+}
+
+function updateHighScoreDisplay() {
+  const mode = difficultySelect.value;
+  document.getElementById("high-score-mode").textContent =
+    mode.charAt(0).toUpperCase() + mode.slice(1);
+  document.getElementById("high-score").textContent = highScores[mode];
+}
+
+function updateScore() {
+  document.getElementById("score").textContent = score;
+
+  if (score <= highScores[gameMode]) return;
+
+  newHighScore = true;
+  highScores[gameMode] = score;
+  localStorage.setItem("waterDropHighScores", JSON.stringify(highScores));
+  updateHighScoreDisplay();
+}
 
 // Wait for button click to start the game
 document.getElementById("start-btn").addEventListener("click", startGame);
@@ -17,21 +49,35 @@ document.getElementById("start-btn").addEventListener("click", startGame);
 document.getElementById("pause-btn").addEventListener("click", pauseGame);
 document.getElementById("reset-btn").addEventListener("click", resetGame);
 difficultySelect.addEventListener("change", resetGame);
-document.getElementById("play-again-btn").addEventListener("click", () => {
-  document.getElementById("win-dialog").close();
-  resetGame();
-  startGame();
+document.querySelectorAll(".play-again-btn").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".end-dialog").forEach((dialog) => dialog.close());
+    resetGame();
+    startGame();
+  });
 });
+document.getElementById("main-screen-btn").addEventListener("click", resetGame);
+document.getElementById("continue-game-btn").addEventListener("click", () => {
+  highScoreDialog.close();
+  showGameResult();
+});
+highScoreDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  highScoreDialog.close();
+  showGameResult();
+});
+updateHighScoreDisplay();
 
 function startGame() {
   // Prevent multiple games from running at once
-  if (gameRunning) return;
+  if (gameRunning || highScoreDialog.open) return;
 
   if (timeLeft === 0) {
     timeLeft = difficulties[difficultySelect.value].time;
     document.getElementById("time").textContent = timeLeft;
   }
 
+  gameMode = difficultySelect.value;
   gameRunning = true;
   difficultySelect.disabled = true;
 
@@ -47,14 +93,30 @@ function startGame() {
       clearInterval(dropMaker);
       clearInterval(countdown);
       document.getElementById("game-container").replaceChildren();
+      updateHighScoreDisplay();
 
-      if (score > 100) {
-        document.getElementById("win-score").textContent = score;
-        document.getElementById("win-dialog").showModal();
+      if (newHighScore) {
+        document.getElementById("new-record-mode").textContent =
+          gameMode.charAt(0).toUpperCase() + gameMode.slice(1);
+        document.getElementById("new-record-score").textContent = highScores[gameMode];
+        highScoreDialog.showModal();
+      } else {
+        showGameResult();
       }
     }
   }, 1000);
 }
+
+function showGameResult() {
+  if (score >= 100) {
+    document.getElementById("win-score").textContent = score;
+    document.getElementById("win-dialog").showModal();
+  } else {
+    document.getElementById("lose-score").textContent = score;
+    document.getElementById("lose-dialog").showModal();
+  }
+}
+
 function pauseGame() {
   // Prevent pausing if the game isn't running
   if (!gameRunning) return;
@@ -72,11 +134,13 @@ function resetGame() {
   clearInterval(dropMaker);
   clearInterval(countdown);
   score = 0;
+  newHighScore = false;
   timeLeft = difficulties[difficultySelect.value].time;
   document.getElementById("score").textContent = score;
   document.getElementById("time").textContent = timeLeft;
   document.getElementById("game-container").replaceChildren();
-  document.getElementById("win-dialog").close();
+  document.querySelectorAll(".end-dialog").forEach((dialog) => dialog.close());
+  updateHighScoreDisplay();
 }
 function createDrop() {
   // Create a new div element that will be our water drop
@@ -107,7 +171,7 @@ function createDrop() {
     if (!gameRunning || !drop.isConnected) return;
 
     score += 10;
-    document.getElementById("score").textContent = score;
+    updateScore();
     drop.remove();
   }
 
@@ -124,7 +188,7 @@ function createDrop() {
     if (!gameRunning || !drop.isConnected) return;
 
     score -= 5;
-    document.getElementById("score").textContent = score;
+    updateScore();
     drop.remove();
   });
 }

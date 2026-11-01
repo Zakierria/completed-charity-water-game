@@ -31,7 +31,7 @@ body {
     min-height: 100vh;
     padding: 24px 12px;
     background-color: #f0f0f0;
-    font-family: Arial, sans-serif;
+    font-family: "Lato", "Avenir Next", Avenir, sans-serif;
 }
 
 .game-wrapper {
@@ -58,6 +58,17 @@ body {
     flex: 0 1 auto;
     font-size: 24px;
     font-weight: bold;
+}
+
+.high-score {
+    margin-top: -12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #003366;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
 }
 
 .difficulty-control {
@@ -132,7 +143,7 @@ body {
     background-color: #5c899b;
 }
 
-.win-dialog {
+.end-dialog {
     position: fixed;
     inset: 0;
     display: none;
@@ -150,11 +161,11 @@ body {
     place-content: center;
 }
 
-.win-dialog[open] {
+.end-dialog[open] {
     display: grid;
 }
 
-.win-dialog::before {
+.end-dialog::before {
     position: absolute;
     z-index: 0;
     right: -10%;
@@ -167,30 +178,34 @@ body {
     animation: water-flood 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
 }
 
-.win-dialog::backdrop {
+.end-dialog::backdrop {
     background: rgba(0, 28, 48, 0.78);
 }
 
-.win-dialog h2,
-.win-dialog p,
-#play-again-btn {
+.end-dialog h2,
+.end-dialog p,
+.end-dialog img,
+.play-again-btn,
+#continue-game-btn,
+#main-screen-btn {
     position: relative;
     z-index: 1;
 }
 
-.win-dialog h2 {
+.end-dialog h2 {
     margin-bottom: 12px;
     color: white;
     font-size: 40px;
 }
 
-.win-dialog p {
+.end-dialog p {
     margin-bottom: 20px;
     color: white;
     font-size: 18px;
 }
 
-#play-again-btn {
+.play-again-btn,
+#continue-game-btn {
     padding: 10px 18px;
     border: 0;
     border-radius: 4px;
@@ -200,8 +215,30 @@ body {
     font-size: 16px;
 }
 
-#play-again-btn:hover {
+.play-again-btn:hover,
+#continue-game-btn:hover {
     background-color: #5c899b;
+}
+
+#main-screen-btn {
+    margin: 12px auto 0;
+    padding: 8px 14px;
+    border: 1px solid white;
+    border-radius: 4px;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    font: inherit;
+}
+
+#main-screen-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.lose-dialog img {
+    width: clamp(120px, 24vw, 200px);
+    margin: 0 auto 16px;
+    transform: rotate(14deg);
 }
 
 @keyframes water-flood {
@@ -212,7 +249,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .win-dialog::before {
+    .end-dialog::before {
         animation-duration: 0.01ms;
     }
 }
@@ -267,6 +304,36 @@ body {
     text-align: center;
 }
 
+.game-footer {
+    width: 100%;
+    padding: 16px 12px;
+    border-top: 3px solid #ffc907;
+    color: #333;
+    font-size: 14px;
+    text-align: center;
+}
+
+.game-footer p {
+    margin-bottom: 8px;
+}
+
+.game-footer nav {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.game-footer a {
+    color: #0066a1;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.game-footer a:hover {
+    color: #003366;
+}
+
 @keyframes dropFall {
     from {
         transform: translateY(-20px);
@@ -290,6 +357,10 @@ body {
     .score,
     .timer {
         font-size: 20px;
+    }
+
+    .high-score {
+        font-size: 16px;
     }
 
     .difficulty-control {

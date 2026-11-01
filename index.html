@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Water Drop Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="game-wrapper">
         <h1 class="game-title">Water Drop</h1>
+        <div class="high-score" aria-live="polite">Best (<span id="high-score-mode">Easy</span>): <span id="high-score">0</span></div>
         <p class="game-tagline">Catch the good drops, avoid the bad ones!</p>
         <div class="score-panel">
             <div class="score">Score: <span id="score">0</span></div>
@@ -28,12 +32,35 @@
         
         <div id="game-container">
         </div>
+
+        <footer class="game-footer">
+            <p>Every drop counts. Help bring clean water to everyone.</p>
+            <nav aria-label="charity: water links">
+                <a href="https://www.charitywater.org/" target="_blank" rel="noopener noreferrer">Visit charity: water</a>
+                <a href="https://www.charitywater.org/donate" target="_blank" rel="noopener noreferrer">Donate</a>
+            </nav>
+        </footer>
     </div>
 
-    <dialog id="win-dialog" class="win-dialog" aria-labelledby="win-title">
+    <dialog id="win-dialog" class="end-dialog" aria-labelledby="win-title">
         <h2 id="win-title">You win!</h2>
         <p>You finished with <span id="win-score">0</span> points.</p>
-        <button id="play-again-btn">Play Again</button>
+        <button class="play-again-btn">Play Again</button>
+        <button id="main-screen-btn" type="button">Return to Main Screen</button>
+    </dialog>
+
+    <dialog id="lose-dialog" class="end-dialog lose-dialog" aria-labelledby="lose-title">
+        <img src="img/water-can.png" alt="charity: water bottle tilted to the side">
+        <h2 id="lose-title">Ahh! Make sure to not waste water!</h2>
+        <h2 id="lose-title">Try Again!</h2>
+        <p>You finished with <span id="lose-score">0</span> points. Try again to reach 100!</p>
+        <button class="play-again-btn">Play Again</button>
+    </dialog>
+
+    <dialog id="high-score-dialog" class="end-dialog" aria-labelledby="high-score-title">
+        <h2 id="high-score-title">New High Score!</h2>
+        <p>You set a new <span id="new-record-mode">Easy</span> record: <span id="new-record-score">0</span> points!</p>
+        <button id="continue-game-btn" type="button">See Results</button>
     </dialog>
     
     <script src="script.js"></script>
