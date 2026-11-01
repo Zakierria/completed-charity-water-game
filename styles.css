@@ -60,6 +60,24 @@ body {
     font-weight: bold;
 }
 
+.difficulty-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#difficulty {
+    min-width: 110px;
+    padding: 8px;
+    border: 1px solid #777;
+    border-radius: 4px;
+    background-color: white;
+    color: #131313;
+    font: inherit;
+}
+
 #game-container {
     width: 100%;
     height: clamp(300px, 70vh, 600px);
@@ -272,6 +290,17 @@ body {
     .score,
     .timer {
         font-size: 20px;
+    }
+
+    .difficulty-control {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    #difficulty {
+        width: 100%;
+        min-width: 0;
     }
 
     #start-btn,

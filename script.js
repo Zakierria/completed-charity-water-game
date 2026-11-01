@@ -4,12 +4,19 @@ let dropMaker; // Will store our timer that creates drops regularly
 let countdown;
 let timeLeft = 30;
 let score = 0;
+const difficulties = {
+  easy: { time: 30, dropDuration: 4 },
+  medium: { time: 30, dropDuration: 3 },
+  hard: { time: 25, dropDuration: 2 },
+};
+const difficultySelect = document.getElementById("difficulty");
 
 // Wait for button click to start the game
 document.getElementById("start-btn").addEventListener("click", startGame);
 // added pause button  
 document.getElementById("pause-btn").addEventListener("click", pauseGame);
 document.getElementById("reset-btn").addEventListener("click", resetGame);
+difficultySelect.addEventListener("change", resetGame);
 document.getElementById("play-again-btn").addEventListener("click", () => {
   document.getElementById("win-dialog").close();
   resetGame();
@@ -21,11 +28,12 @@ function startGame() {
   if (gameRunning) return;
 
   if (timeLeft === 0) {
-    timeLeft = 30;
+    timeLeft = difficulties[difficultySelect.value].time;
     document.getElementById("time").textContent = timeLeft;
   }
 
   gameRunning = true;
+  difficultySelect.disabled = true;
 
   // Create new drops every second (1000 milliseconds)
   dropMaker = setInterval(createDrop, 1000);
@@ -35,6 +43,7 @@ function startGame() {
 
     if (timeLeft === 0) {
       gameRunning = false;
+      difficultySelect.disabled = false;
       clearInterval(dropMaker);
       clearInterval(countdown);
       document.getElementById("game-container").replaceChildren();
@@ -51,6 +60,7 @@ function pauseGame() {
   if (!gameRunning) return;
 
   gameRunning = false;
+  difficultySelect.disabled = false;
 
   // Stop creating new drops
   clearInterval(dropMaker);
@@ -58,10 +68,11 @@ function pauseGame() {
 }
 function resetGame() {
   gameRunning = false;
+  difficultySelect.disabled = false;
   clearInterval(dropMaker);
   clearInterval(countdown);
   score = 0;
-  timeLeft = 30;
+  timeLeft = difficulties[difficultySelect.value].time;
   document.getElementById("score").textContent = score;
   document.getElementById("time").textContent = timeLeft;
   document.getElementById("game-container").replaceChildren();
@@ -87,14 +98,13 @@ function createDrop() {
   const xPosition = Math.random() * Math.max(0, gameWidth - size);
   drop.style.left = xPosition + "px";
 
-  // Make drops fall for 4 seconds
-  drop.style.animationDuration = "4s";
+  drop.style.animationDuration = `${difficulties[difficultySelect.value].dropDuration}s`;
 
   // Add the new drop to the game screen
   document.getElementById("game-container").appendChild(drop);
 
   function catchDrop() {
-    if (!drop.isConnected) return;
+    if (!gameRunning || !drop.isConnected) return;
 
     score += 10;
     document.getElementById("score").textContent = score;
@@ -111,7 +121,7 @@ function createDrop() {
 
   // Remove drops that reach the bottom (weren't clicked)
   drop.addEventListener("animationend", () => {
-    if (!drop.isConnected) return;
+    if (!gameRunning || !drop.isConnected) return;
 
     score -= 5;
     document.getElementById("score").textContent = score;
